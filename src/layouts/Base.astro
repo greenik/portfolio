@@ -1,0 +1,70 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import { person } from '../data/projects';
+import { HOME, LANGS, type Strings } from '../i18n';
+
+interface Props {
+  t: Strings;
+}
+
+const { t } = Astro.props;
+const site = Astro.site;
+// Absolute URLs need `site` in astro.config.mjs; until then share images fall back to relative paths.
+const absolute = (path: string) => (site ? new URL(path, site).href : path);
+const ogImage = absolute(`/og/${t.lang}.png`);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  jobTitle: 'Senior Angular & Full-Stack Developer',
+  email: `mailto:${person.email}`,
+  address: { '@type': 'PostalAddress', addressLocality: 'Lublin', addressCountry: 'PL' },
+  sameAs: [person.linkedin],
+  knowsAbout: ['Angular', 'TypeScript', 'RxJS', 'Python', 'Django', 'Node.js', 'NestJS', 'Next.js', 'Astro'],
+};
+---
+
+<!doctype html>
+<html lang={t.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{t.meta.title}</title>
+    <meta name="description" content={t.meta.description} />
+    <meta name="author" content={person.name} />
+    {/* Mirrors of --color-paper; ThemeToggle rewrites both when the visitor picks a theme. */}
+    <meta name="theme-color" content="#f5fafd" media="(prefers-color-scheme: light)" data-theme-color />
+    <meta name="theme-color" content="#1b262c" media="(prefers-color-scheme: dark)" data-theme-color />
+    <script is:inline>
+      // Apply a remembered theme before first paint, so a dark choice never flashes light.
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+      } catch {}
+    </script>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {site && LANGS.map((lang) => <link rel="alternate" hreflang={lang} href={absolute(HOME[lang])} />)}
+    {site && <link rel="alternate" hreflang="x-default" href={absolute(HOME.en)} />}
+    {site && <link rel="canonical" href={absolute(HOME[t.lang])} />}
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={t.ogLocale} />
+    <meta property="profile:first_name" content="Kamil" />
+    <meta property="profile:last_name" content="Zieliński" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <Font cssVariable="--font-cabinet" preload />
+    <Font cssVariable="--font-switzer" preload />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">{t.skip}</a>
+    <slot />
+  </body>
+</html>

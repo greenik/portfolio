@@ -1,0 +1,53 @@
+[
+  {
+    "date": "2026-10-09",
+    "macrostructure": "Split Studio",
+    "theme": "custom",
+    "theme_axes": "light + dark / grotesk-sans heavy / cool (blue 232–244)",
+    "vibe": "user palette: #1B262C #0F4C75 #3282B8 #BBE1FA",
+    "enrichment": "none (typographic); motion: line rise + marker sweep, theme wipe, scroll rail",
+    "nav": "N1a Wordmark + 2 links (+ lang, theme)",
+    "footer": "Ft6 Letter close on band",
+    "brief": "Kamil Zieliński · chosen direction (C) refined: palette, dark mode, selected work, filter, PL"
+  },
+  {
+    "date": "2026-10-09",
+    "macrostructure": "Manifesto (poster)",
+    "theme": "Brutal-family · Signal",
+    "theme_axes": "light (sand) / display-condensed / warm (vermilion)",
+    "enrichment": "none",
+    "nav": "N7 Brutal slab",
+    "footer": "Ft6 Letter close (shared)",
+    "brief": "Kamil Zieliński · portfolio sketch D (/d) · full-stack positioning"
+  },
+  {
+    "date": "2026-10-09",
+    "macrostructure": "Split Studio",
+    "theme": "Cobalt-family",
+    "theme_axes": "light (cool) / grotesk-sans heavy / cool (cobalt)",
+    "enrichment": "none",
+    "nav": "N1a Wordmark + 2 links",
+    "footer": "Ft6 Letter close (shared)",
+    "brief": "Kamil Zieliński · portfolio sketch C (/c) · full-stack positioning"
+  },
+  {
+    "date": "2026-10-09",
+    "macrostructure": "Map / Diagram",
+    "theme": "Midnight-family · Night shift",
+    "theme_axes": "dark (navy) / grotesk + mono / warm (marigold)",
+    "enrichment": "typographic stack diagram",
+    "nav": "N2 Floating chip",
+    "footer": "Ft6 Letter close (shared)",
+    "brief": "Kamil Zieliński · portfolio sketch B (/b) · full-stack positioning"
+  },
+  {
+    "date": "2026-10-09",
+    "macrostructure": "Marquee Hero",
+    "theme": "Studio",
+    "theme_axes": "light (cream) / high-contrast-serif / chromatic-green",
+    "enrichment": "none",
+    "nav": "N9 Edge-aligned minimal",
+    "footer": "Ft6 Letter close",
+    "brief": "Kamil Zieliński · portfolio sketch A (/) · headline broadened to full-stack"
+  }
+]

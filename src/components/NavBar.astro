@@ -1,0 +1,102 @@
+---
+// N1a · Wordmark + 2 links, plus the language and theme controls.
+// Justified: the page has exactly two destinations, the work and the address.
+import ThemeToggle from './ThemeToggle.astro';
+import { person } from '../data/projects';
+import { HOME, type Strings } from '../i18n';
+
+interface Props {
+  t: Strings;
+}
+
+const { t } = Astro.props;
+---
+
+<header class="bar wrap">
+  <a class="bar__name" href={HOME[t.lang]}>{person.name}</a>
+  <div class="bar__end">
+    <nav class="bar__links" aria-label={t.lang === 'pl' ? 'Strona' : 'Page'}>
+      <a class="link" href="#work">{t.nav.work}</a>
+      <a class="link" href="#contact">{t.nav.contact}</a>
+    </nav>
+    <a class="bar__lang" href={t.nav.switchHref} hreflang={t.nav.switchLang} lang={t.nav.switchLang} aria-label={t.nav.switchLabel}>
+      {t.nav.switchName}
+    </a>
+    <ThemeToggle label={t.nav.theme} />
+  </div>
+</header>
+
+<style>
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding-block: var(--space-md);
+  }
+
+  .bar__name {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--text-md);
+    letter-spacing: var(--name-tracking);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--dur-micro) var(--ease-out);
+  }
+
+  .bar__name:hover {
+    color: var(--color-accent-text);
+  }
+
+  .bar__name:active {
+    color: var(--color-ink);
+  }
+
+  .bar__end {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    line-height: 1;
+  }
+
+  /* On phones the two anchor links drop out; the page is one scroll and the controls stay. */
+  .bar__links {
+    display: none;
+    gap: var(--space-lg);
+    margin-inline-end: var(--space-sm);
+  }
+
+  .bar__lang {
+    display: inline-grid;
+    place-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: var(--radius-sm);
+    transition: color var(--dur-micro) var(--ease-out);
+  }
+
+  .bar__lang:hover {
+    color: var(--color-accent-text);
+  }
+
+  .bar__lang:active {
+    color: var(--color-ink);
+  }
+
+  @media (min-width: 40rem) {
+    .bar {
+      padding-block: var(--space-lg);
+    }
+
+    .bar__links {
+      display: flex;
+    }
+  }
+</style>

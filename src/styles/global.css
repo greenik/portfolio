@@ -1,0 +1,201 @@
+/* Hallmark · genre: editorial · macrostructure: Split Studio · theme: custom (user palette, light + dark) · enrichment: none
+ * nav: N1a (+ language and theme controls) · footer: Ft6 · tone: editorial, Swiss · anchor hue: 232–244 (blue)
+ * motion: hero line rise + marker sweep · theme wipe (View Transitions) · scroll-linked work rail · filter reflow
+ * Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V4
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: clip;
+  background: var(--color-paper);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: clip;
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--body-weight);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Paper grain: a fixed, barely-there noise tile behind everything. Sits under content, never over text. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--grain-specks);
+  opacity: var(--grain-opacity);
+  pointer-events: none;
+}
+
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+::selection {
+  background: var(--color-highlight);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: max(var(--page-gutter), env(safe-area-inset-left)) max(var(--page-gutter), env(safe-area-inset-right));
+}
+
+/* Shared section heading — roman, heavy, stacked above its content. */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: var(--title-weight);
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--title-tracking);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* C3 typographic link — a word and a hairline underline in the bright blue. */
+.link {
+  color: var(--color-ink);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--rule-hair);
+  text-decoration-color: var(--color-bright);
+  text-underline-offset: 0.2em;
+  white-space: nowrap;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+
+.link:hover {
+  color: var(--color-accent-text);
+}
+
+.link:active {
+  color: var(--color-ink);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: absolute;
+  inset-block-start: var(--space-xs);
+  inset-inline-start: var(--space-xs);
+  z-index: var(--z-raised);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip:focus-visible {
+  transform: none;
+}
+
+/* One orchestrated entrance, hero only. Stagger by --i, total under 500ms. */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: reveal var(--dur-long) var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms + 240ms);
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Theme switch: the new theme spreads in a circle from the toggle (set by ThemeToggle.astro). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+}
+
+html.is-wiping::view-transition-old(root),
+html.is-wiping::view-transition-new(root) {
+  animation: none;
+}
+
+html.is-wiping::view-transition-new(root) {
+  animation: wipe var(--dur-wipe) var(--ease-in-out);
+}
+
+@keyframes wipe {
+  from {
+    clip-path: circle(0 at var(--wipe-x, 100%) var(--wipe-y, 0));
+  }
+  to {
+    clip-path: circle(var(--wipe-r, 150vmax) at var(--wipe-x, 100%) var(--wipe-y, 0));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 150ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+  }
+
+  .reveal {
+    transform: none;
+    animation: reveal-reduced 150ms linear forwards;
+    animation-delay: 0ms;
+  }
+
+  @keyframes reveal-reduced {
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,196 @@
+---
+// Split Studio. A diptych: the claim and its deck on the left, the proof on the right,
+// hung from a blue bar and bottom-aligned with the deck.
+// Entrance: each headline line rises out of its own mask, then a highlighter band
+// sweeps in behind the second line. Plays once; reduced motion gets a plain fade.
+import type { Strings } from '../i18n';
+
+interface Props {
+  t: Strings;
+}
+
+const { t } = Astro.props;
+const [first, second] = t.hero.title;
+---
+
+<section class="hero wrap" aria-labelledby="hero-title">
+  <div class="hero__claim">
+    <h1 id="hero-title" class="hero__title">
+      <span class="hero__line"><span class="hero__rise" style="--i: 0">{first}</span></span>
+      <span class="hero__line"><span class="hero__rise" style="--i: 1"><span class="hero__mark">{second}</span></span></span>
+    </h1>
+    <div class="hero__deck reveal" style="--i: 2">
+      {t.hero.deck.map((paragraph, i) => <p class={i === 0 ? 'hero__lede' : undefined}>{paragraph}</p>)}
+    </div>
+  </div>
+
+  <dl class="hero__facts reveal" style="--i: 3">
+    {
+      t.hero.facts.map((row) => (
+        <div class={row.status ? 'hero__fact hero__fact--status' : 'hero__fact'}>
+          <dt>{row.label}</dt>
+          <dd>{row.value}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>
+
+<div class="wrap">
+  <hr class="hero__rule" />
+</div>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-2xl);
+    padding-block: var(--space-xl) var(--space-3xl);
+  }
+
+  .hero__claim {
+    display: grid;
+    gap: var(--space-xl);
+    min-width: 0;
+  }
+
+  .hero__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--display-tracking);
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  /* Each line is its own mask; the padding keeps descenders inside it. */
+  .hero__line {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.12em;
+    margin-block-end: -0.12em;
+  }
+
+  .hero__rise {
+    display: block;
+    animation: rise var(--dur-reveal) var(--ease-out) both;
+    animation-delay: calc(var(--i) * 110ms + 60ms);
+  }
+
+  @keyframes rise {
+    from {
+      transform: translateY(110%);
+    }
+  }
+
+  /* Highlighter band behind the lower two-thirds of the letters; cloned per line if it wraps. */
+  .hero__mark {
+    color: var(--color-accent);
+    background-image: linear-gradient(var(--color-highlight), var(--color-highlight));
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 100% 0.42em;
+    padding-inline: 0.04em;
+    margin-inline: -0.04em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    animation: sweep 700ms var(--ease-out) 620ms both;
+  }
+
+  @keyframes sweep {
+    from {
+      background-size: 0% 0.42em;
+    }
+  }
+
+  .hero__deck {
+    display: grid;
+    gap: var(--space-md);
+    max-width: 38rem;
+  }
+
+  .hero__lede {
+    font-size: var(--text-md);
+    line-height: 1.45;
+  }
+
+  .hero__facts {
+    display: grid;
+    border-block-start: var(--rule-thick) solid var(--color-bright);
+  }
+
+  .hero__fact {
+    display: grid;
+    gap: var(--space-3xs);
+    padding-block: var(--space-sm);
+    border-block-end: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .hero__fact dt {
+    font-size: var(--text-sm);
+    font-weight: var(--label-weight);
+    color: var(--color-muted);
+  }
+
+  .hero__fact dd {
+    font-family: var(--font-display);
+    font-weight: var(--name-weight);
+    font-size: var(--text-md);
+    letter-spacing: var(--name-tracking);
+    line-height: var(--leading-tight);
+  }
+
+  /* Availability carries a static marker: a square, not a pulsing dot. */
+  .hero__fact--status dd {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+  }
+
+  .hero__fact--status dd::before {
+    content: '';
+    flex: none;
+    width: 0.5em;
+    height: 0.5em;
+    background: var(--color-bright);
+  }
+
+  .hero__rule {
+    margin: 0;
+    border: 0;
+    border-block-start: var(--rule-thick) solid var(--color-rule-strong);
+  }
+
+  @media (min-width: 60rem) {
+    .hero {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-lg);
+      padding-block: var(--space-3xl) var(--space-4xl);
+    }
+
+    .hero__claim {
+      grid-column: 1 / span 8;
+    }
+
+    .hero__facts {
+      grid-column: 9 / span 4;
+      align-self: end;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__rise {
+      animation: fade 150ms linear both;
+    }
+
+    .hero__mark {
+      animation: none;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+      }
+    }
+  }
+</style>

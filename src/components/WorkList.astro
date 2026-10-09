@@ -1,0 +1,404 @@
+---
+// F3 · Tabular spec sheet, set as a register: year, project, stack. Hairlines, no cards.
+// Extras: a stack filter (progressive enhancement; the full list works without JS),
+// and a timeline rail that fills as you read down the decade (scroll-driven CSS where supported).
+import { projects, TAGS } from '../data/projects';
+import { fill, monthYear, type Strings } from '../i18n';
+
+interface Props {
+  t: Strings;
+}
+
+const { t } = Astro.props;
+const count = (tag: string) => projects.filter((p) => (p.tags as string[]).includes(tag)).length;
+const range = (start: string, end: string | null) =>
+  `${monthYear(start, t.locale)} – ${end ? monthYear(end, t.locale) : t.work.present}`;
+---
+
+<section class="work wrap" id="work" aria-labelledby="work-title" data-work data-status={t.work.status}>
+  <div class="work__head">
+    <h2 id="work-title" class="section-title">{t.work.title}</h2>
+    <p class="work__intro">{t.work.intro}</p>
+  </div>
+
+  <div class="work__filter" role="group" aria-label={t.work.filterLabel} data-filter hidden>
+    <button class="chip" type="button" aria-pressed="true" data-tag="all">
+      {t.work.all}<span class="chip__count">{projects.length}</span>
+    </button>
+    {
+      TAGS.map((tag) => (
+        <button class="chip" type="button" aria-pressed="false" data-tag={tag}>
+          {t.work.tags[tag]}
+          <span class="chip__count">{count(tag)}</span>
+        </button>
+      ))
+    }
+    <p class="work__status" aria-live="polite" data-filter-status>
+      {fill(t.work.status, { shown: projects.length, total: projects.length })}
+    </p>
+  </div>
+
+  <ol class="work__list" data-list>
+    {
+      projects.map((project) => {
+        const copy = t.work.projects[project.id];
+        return (
+          <li class="entry" data-tags={project.tags.join(' ')} style={`--vt: entry-${project.id}`}>
+            <p class="entry__when">
+              <span class="entry__year">{project.start.slice(0, 4)}</span>
+              <span class="entry__range">
+                {range(project.start, project.end)} · {project.org}
+              </span>
+            </p>
+            <div class="entry__body">
+              <h3 class="entry__name">{project.name}</h3>
+              <p>{copy.what}</p>
+              {copy.note && <p class="entry__note">{copy.note}</p>}
+            </div>
+            <ul class="entry__stack" aria-label="Stack">
+              {project.stack.map((tech) => (
+                <li>{tech}</li>
+              ))}
+            </ul>
+          </li>
+        );
+      })
+    }
+  </ol>
+</section>
+
+<script>
+  const work = document.querySelector<HTMLElement>('[data-work]');
+  const filter = work?.querySelector<HTMLElement>('[data-filter]');
+  const status = work?.querySelector<HTMLElement>('[data-filter-status]');
+  const chips = [...(work?.querySelectorAll<HTMLButtonElement>('[data-tag]') ?? [])];
+  const entries = [...(work?.querySelectorAll<HTMLElement>('[data-tags]') ?? [])];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const root = document.documentElement;
+
+  const show = (tag: string) => {
+    let shown = 0;
+    for (const entry of entries) {
+      const match = tag === 'all' || (entry.dataset.tags ?? '').split(' ').includes(tag);
+      entry.hidden = !match;
+      if (match) shown += 1;
+    }
+    for (const chip of chips) chip.setAttribute('aria-pressed', String(chip.dataset.tag === tag));
+    if (status && work?.dataset.status) {
+      status.textContent = work.dataset.status
+        .replace('{shown}', String(shown))
+        .replace('{total}', String(entries.length));
+    }
+  };
+
+  if (filter && chips.length) {
+    filter.hidden = false;
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        const tag = chip.dataset.tag ?? 'all';
+        if (chip.getAttribute('aria-pressed') === 'true') return;
+        if (!document.startViewTransition || reduceMotion.matches) {
+          show(tag);
+          return;
+        }
+        // Rows that stay glide to their new place; rows that leave or arrive cross-fade.
+        root.classList.add('is-filtering');
+        const transition = document.startViewTransition(() => show(tag));
+        transition.finished.finally(() => root.classList.remove('is-filtering'));
+      });
+    }
+  }
+</script>
+
+<style>
+  .work {
+    padding-block: var(--space-3xl) var(--space-3xl);
+  }
+
+  .work__head {
+    display: grid;
+    gap: var(--space-md);
+    max-width: var(--measure);
+    margin-block-end: var(--space-xl);
+  }
+
+  .work__intro {
+    color: var(--color-muted);
+  }
+
+  /* ── Filter ───────────────────────────────────────────── */
+  .work__filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-block-end: var(--space-xl);
+  }
+
+  .work__filter[hidden] {
+    display: none;
+  }
+
+  /* C1 · Outlined chip, toggle-button semantics: default · hover · focus · active · pressed · disabled */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: 44px;
+    padding-inline: var(--space-md);
+    border: var(--rule-hair) solid var(--color-rule);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-micro) var(--ease-out),
+      border-color var(--dur-micro) var(--ease-out),
+      transform var(--dur-micro) var(--ease-out);
+  }
+
+  .chip:hover {
+    border-color: var(--color-bright);
+  }
+
+  .chip:active {
+    transform: translateY(1px);
+  }
+
+  .chip[aria-pressed='true'] {
+    border-color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .chip:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .chip__count {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted);
+  }
+
+  .chip[aria-pressed='true'] .chip__count {
+    color: inherit;
+    opacity: 0.7;
+  }
+
+  .work__status {
+    flex-basis: 100%;
+    margin-block-start: var(--space-xs);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  /* ── List and rail ────────────────────────────────────── */
+  .work__list {
+    position: relative;
+    padding-inline-start: var(--space-lg);
+    border-block-start: var(--rule-hair) solid var(--color-rule-strong);
+    view-timeline-name: --work;
+  }
+
+  /* The track, and the fill that follows the reader down the decade. */
+  .work__list::before,
+  .work__list::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0.25rem;
+    width: 2px;
+  }
+
+  .work__list::before {
+    background: var(--color-rule);
+  }
+
+  .work__list::after {
+    background: var(--color-bright);
+    transform-origin: top;
+    transform: scaleY(0);
+  }
+
+  .entry {
+    position: relative;
+    display: grid;
+    gap: var(--space-sm);
+    padding-block: var(--space-lg) var(--space-xl);
+    border-block-end: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .entry[hidden] {
+    display: none;
+  }
+
+  /* A node on the rail for every year. */
+  .entry::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: calc(-1 * var(--space-lg) + 0.25rem - 4px);
+    inset-block-start: calc(var(--space-lg) + 0.45em);
+    width: 10px;
+    height: 10px;
+    background: var(--color-bright);
+  }
+
+  .entry__when {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+  }
+
+  .entry__year {
+    font-family: var(--font-display);
+    font-weight: var(--title-weight);
+    font-size: var(--text-xl);
+    line-height: 1;
+    letter-spacing: var(--title-tracking);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .entry__range {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry__body {
+    display: grid;
+    gap: var(--space-2xs);
+    max-width: var(--measure);
+    min-width: 0;
+  }
+
+  .entry__name {
+    font-family: var(--font-display);
+    font-weight: var(--name-weight);
+    font-size: var(--text-md);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--name-tracking);
+    overflow-wrap: anywhere;
+    min-width: 0;
+    margin-block-end: var(--space-2xs);
+  }
+
+  .entry__note {
+    color: var(--color-muted);
+  }
+
+  .entry__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .entry__stack li {
+    white-space: nowrap;
+  }
+
+  /* Scroll-driven: the rail fills and each year lights up as it crosses the middle of the screen.
+     Without support (or with reduced motion) the rail is simply full and every year is lit. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .work__list::after {
+        animation: rail-fill linear both;
+      }
+
+      .entry__year,
+      .entry::before {
+        animation: year-lit linear both;
+      }
+
+      /* Timeline and range live in their own, more specific rules: the CSS minifier would
+         otherwise fold them into the shorthand above, which browsers reject. */
+      .work .work__list::after {
+        animation-timeline: --work;
+        animation-range: cover 50vh cover calc(100% - 50vh);
+      }
+
+      .work .entry__year,
+      .work .entry::before {
+        animation-timeline: view();
+        animation-range: cover 25% cover 75%;
+      }
+    }
+  }
+
+  @supports not (animation-timeline: view()) {
+    .work__list::after {
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .work__list::after {
+      transform: none;
+    }
+  }
+
+  @keyframes rail-fill {
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes year-lit {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    35%,
+    65% {
+      opacity: 1;
+    }
+  }
+
+  /* Filter reflow (see script): each row keeps its identity through the view transition. */
+  :global(html.is-filtering) .entry {
+    view-transition-name: var(--vt);
+  }
+
+  :global(html.is-filtering::view-transition-group(*)) {
+    animation-duration: var(--dur-long);
+    animation-timing-function: var(--ease-out);
+  }
+
+  @media (min-width: 60rem) {
+    .entry {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-lg);
+      align-items: start;
+      padding-block: var(--space-xl);
+    }
+
+    .entry::before {
+      inset-block-start: calc(var(--space-xl) + 0.45em);
+    }
+
+    .entry__when {
+      grid-column: 1 / span 2;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .entry__body {
+      grid-column: 3 / span 6;
+    }
+
+    /* Column 9 stays empty: the gap is the separator. */
+    .entry__stack {
+      grid-column: 10 / span 3;
+      flex-direction: column;
+      gap: var(--space-2xs);
+      padding-block-start: var(--space-xs);
+    }
+  }
+</style>

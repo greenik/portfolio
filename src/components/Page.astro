@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import NavBar from './NavBar.astro';
+import Hero from './Hero.astro';
+import SelectedWork from './SelectedWork.astro';
+import WorkList from './WorkList.astro';
+import Toolbox from './Toolbox.astro';
+import Close from './Close.astro';
+import Signoff from './Signoff.astro';
+import { getStrings, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = getStrings(Astro.props.lang);
+---
+
+<Base t={t}>
+  <NavBar t={t} />
+  <main id="main">
+    <Hero t={t} />
+    <SelectedWork t={t} />
+    <WorkList t={t} />
+    <Toolbox t={t} />
+    <Close t={t} />
+  </main>
+  <Signoff t={t} />
+</Base>

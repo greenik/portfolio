@@ -1,0 +1,89 @@
+---
+// Share-card template (1200 × 630), not linked from the site and kept out of search.
+// Regenerate public/og/<lang>.png after changing the headline: see README.
+import { Font } from 'astro:assets';
+import '../../styles/tokens.css';
+import { person } from '../../data/projects';
+import { getStrings, LANGS, type Lang } from '../../i18n';
+
+export function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+
+const t = getStrings(Astro.params.lang as Lang);
+const [first, second] = t.hero.title;
+---
+
+<!doctype html>
+<html lang={t.lang} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Share card · {t.lang}</title>
+    <Font cssVariable="--font-cabinet" preload />
+    <Font cssVariable="--font-switzer" preload />
+  </head>
+  <body>
+    <main class="card">
+      <p class="card__name">{person.name}</p>
+      <p class="card__title">
+        <span>{first}</span>
+        <span class="card__mark">{second}</span>
+      </p>
+      <p class="card__role">Senior Angular &amp; Full-Stack Developer · Lublin</p>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+  }
+
+  .card {
+    box-sizing: border-box;
+    width: 1200px;
+    height: 630px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 64px 72px;
+    border-block-end: 24px solid var(--color-band);
+  }
+
+  .card__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 34px;
+    letter-spacing: -0.02em;
+  }
+
+  .card__title {
+    align-self: center;
+    display: grid;
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 112px;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .card__mark {
+    justify-self: start;
+    color: var(--color-accent);
+    background-image: linear-gradient(var(--color-highlight), var(--color-highlight));
+    background-repeat: no-repeat;
+    background-position: 0 88%;
+    background-size: 100% 0.42em;
+  }
+
+  .card__role {
+    margin: 0;
+    font-size: 28px;
+    color: var(--color-muted);
+  }
+</style>

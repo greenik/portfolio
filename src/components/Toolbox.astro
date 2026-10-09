@@ -1,0 +1,95 @@
+---
+// Two side-by-side sections: a wide toolbox and a narrow background column.
+import type { Strings } from '../i18n';
+
+interface Props {
+  t: Strings;
+}
+
+const { t } = Astro.props;
+---
+
+<div class="tools wrap">
+  <section class="tools__main" aria-labelledby="toolbox-title">
+    <h2 id="toolbox-title" class="section-title">{t.toolbox.title}</h2>
+    <dl class="tools__list">
+      {
+        t.toolbox.rows.map((row) => (
+          <div>
+            <dt>{row.label}</dt>
+            <dd>{row.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="tools__aside" aria-labelledby="background-title">
+    <h2 id="background-title" class="section-title">{t.background.title}</h2>
+    <dl class="tools__list tools__list--stacked">
+      {
+        t.background.rows.map((row) => (
+          <div>
+            <dt>{row.label}</dt>
+            <dd>{row.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</div>
+
+<style>
+  .tools {
+    display: grid;
+    gap: var(--space-3xl);
+    padding-block: var(--space-2xl) var(--space-4xl);
+  }
+
+  .tools__main,
+  .tools__aside {
+    display: grid;
+    align-content: start;
+    gap: var(--space-xl);
+    min-width: 0;
+  }
+
+  .tools__list > div {
+    display: grid;
+    gap: var(--space-2xs);
+    padding-block: var(--space-md);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .tools__list dt {
+    font-size: var(--text-sm);
+    font-weight: var(--label-weight);
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .tools__list:not(.tools__list--stacked) > div {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .tools__list:not(.tools__list--stacked) dt {
+      padding-block-start: var(--space-3xs);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .tools {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-lg);
+    }
+
+    .tools__main {
+      grid-column: 1 / span 7;
+    }
+
+    .tools__aside {
+      grid-column: 9 / span 4;
+    }
+  }
+</style>

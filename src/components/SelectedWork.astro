@@ -1,0 +1,158 @@
+---
+// Selected work: three projects, three kinds of problem. One wide column and two narrow ones,
+// not three equal cards. Each carries a single real figure from the CV, at section-heading size.
+import { featured, projectById } from '../data/projects';
+import { yearSpan, type Strings } from '../i18n';
+
+interface Props {
+  t: Strings;
+}
+
+const { t } = Astro.props;
+const cases = featured.map((id) => ({ id, project: projectById(id), copy: t.selected.cases[id] }));
+---
+
+<section class="selected wrap" aria-labelledby="selected-title">
+  <div class="selected__head">
+    <h2 id="selected-title" class="section-title">{t.selected.title}</h2>
+    <p class="selected__intro">{t.selected.intro}</p>
+  </div>
+
+  <ol class="selected__list">
+    {
+      cases.map(({ id, project, copy }) => (
+        <li class={`case case--${id}`}>
+          <h3 class="case__name">{project.name}</h3>
+          <p class="case__meta">
+            {project.org} · {project.stack[0] === 'Python' ? 'Python / Django' : project.stack[0]} ·{' '}
+            <span class="case__years">{yearSpan(project.start, project.end, t.work.present)}</span>
+          </p>
+          <p class="case__figure">
+            <span class="case__number">{copy.figure}</span>
+            <span class="case__label">{copy.figureLabel}</span>
+          </p>
+          <p class="case__body">{copy.body}</p>
+          <p class="case__kind">{copy.kind}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .selected {
+    padding-block: var(--space-2xl) var(--space-3xl);
+  }
+
+  .selected__head {
+    display: grid;
+    gap: var(--space-sm);
+    max-width: var(--measure);
+    margin-block-end: var(--space-xl);
+  }
+
+  .selected__intro {
+    color: var(--color-muted);
+  }
+
+  .selected__list {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .case {
+    display: grid;
+    align-content: start;
+    gap: var(--space-sm);
+    padding-block-start: var(--space-md);
+    border-block-start: var(--rule-hair) solid var(--color-rule-strong);
+    min-width: 0;
+  }
+
+  .case__name {
+    font-family: var(--font-display);
+    font-weight: var(--title-weight);
+    font-size: var(--text-md);
+    letter-spacing: var(--name-tracking);
+    line-height: var(--leading-tight);
+  }
+
+  .case__meta {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .case__years {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .case__figure {
+    display: grid;
+    gap: var(--space-3xs);
+    margin-block: var(--space-sm);
+  }
+
+  .case__number {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--text-xl);
+    line-height: 1;
+    letter-spacing: var(--title-tracking);
+    color: var(--color-accent);
+    font-variant-numeric: lining-nums;
+  }
+
+  .case__label {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .case__body {
+    max-width: var(--measure);
+  }
+
+  /* The kind of problem sits at the foot of each case, set like a filing tag. */
+  .case__kind {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-xs);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .case__kind::before {
+    content: '';
+    flex: none;
+    width: 0.55em;
+    height: 0.55em;
+    background: var(--color-bright);
+  }
+
+  @media (min-width: 60rem) {
+    .selected {
+      padding-block: var(--space-3xl) var(--space-3xl);
+    }
+
+    .selected__list {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-lg);
+    }
+
+    /* The wide case gets room to breathe; its body runs at a longer measure. */
+    .case--pacemo {
+      grid-column: 1 / span 6;
+      padding-inline-end: var(--space-xl);
+    }
+
+    .case--growing {
+      grid-column: 7 / span 3;
+    }
+
+    .case--hid {
+      grid-column: 10 / span 3;
+    }
+  }
+</style>
