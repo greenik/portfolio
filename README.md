@@ -9,8 +9,28 @@ npm run dev      # http://localhost:4321
 npm run build    # static output in dist/
 ```
 
-`dist/` is plain static files: Cloudflare Pages, Netlify or GitHub Pages
-(build command `npm run build`, output directory `dist`).
+## Deploying (Cloudflare Workers, static assets)
+
+The site is an assets-only Worker named `portfolio`, connected to GitHub through Workers Builds:
+every push to `main` deploys to production. Config: `wrangler.jsonc` (its `name` must match the
+Worker name in the dashboard).
+
+Workers Builds settings (dashboard → Worker → Settings → Build):
+
+- Build command: `npm run build` (Workers Builds ignores build settings in `wrangler.jsonc`)
+- Deploy command: `npx wrangler deploy`
+- Root directory: `/` · Node: build image default (24), pinned by `.nvmrc`
+
+Locally:
+
+- `npm run preview:worker` — build, then serve `dist/` with Cloudflare's runtime (headers, 404, redirects).
+- `npm run deploy` — manual deploy from this machine (needs `npx wrangler login` once).
+
+`public/_headers` sets security headers and long-term caching for hashed assets in `/_astro/`.
+`src/pages/404.astro` becomes `dist/404.html`, served with a 404 status (`not_found_handling: "404-page"`).
+
+Custom domain: Workers only accept domains whose DNS is on Cloudflare (nameservers moved to
+Cloudflare). Add it under Worker → Settings → Domains & Routes, then set `site` in `astro.config.mjs`.
 
 ## Editing
 

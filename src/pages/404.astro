@@ -1,0 +1,54 @@
+---
+// Served by Cloudflare Pages for any unknown URL (with a real 404 status).
+// Without this file Pages would fall back to SPA mode and answer every bad URL with the homepage.
+import Base from '../layouts/Base.astro';
+import NavBar from '../components/NavBar.astro';
+import Signoff from '../components/Signoff.astro';
+import { getStrings, HOME } from '../i18n';
+
+const t = getStrings('en');
+---
+
+<Base t={{ ...t, meta: { ...t.meta, title: 'Page not found · Kamil Zieliński' } }}>
+  <NavBar t={t} />
+  <main id="main" class="lost wrap">
+    <h1 class="lost__title">Nothing at this address.</h1>
+    <p class="lost__alt" lang="pl">Pod tym adresem nic nie ma.</p>
+    <ul class="lost__links">
+      <li><a class="link" href={HOME.en}>Go to the homepage</a></li>
+      <li><a class="link" href={HOME.pl} hreflang="pl" lang="pl">Strona główna po polsku</a></li>
+    </ul>
+  </main>
+  <Signoff t={t} />
+</Base>
+
+<style>
+  .lost {
+    display: grid;
+    align-content: start;
+    gap: var(--space-md);
+    min-height: 60dvh;
+    padding-block: var(--space-3xl) var(--space-4xl);
+  }
+
+  .lost__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: var(--text-xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--title-tracking);
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .lost__alt {
+    color: var(--color-muted);
+  }
+
+  .lost__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-xl);
+    margin-block-start: var(--space-md);
+  }
+</style>

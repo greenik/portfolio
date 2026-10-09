@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Assets-only Cloudflare Worker serving the static Astro build. No `main`: there is no server code.
+  // `name` must match the Worker name in the Cloudflare dashboard, or Workers Builds fails.
+  // Workers Builds ignores build settings here: its Build command (dashboard) must be `npm run build`.
+  "name": "portfolio",
+  "compatibility_date": "2026-10-09",
+  "assets": {
+    "directory": "./dist",
+    // Unknown URLs get dist/404.html with a real 404 status.
+    "not_found_handling": "404-page",
+    // /pl → /pl/ and /pl/ → pl/index.html
+    "html_handling": "auto-trailing-slash"
+  }
+}
